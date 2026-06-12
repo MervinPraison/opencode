@@ -9,6 +9,7 @@ import { PositiveInt, RelativePath } from "./schema"
 import { FileSystemSearch } from "./filesystem/search"
 import { Entry, Match } from "./filesystem/schema"
 export { Entry, Match, Submatch } from "./filesystem/schema"
+export const AppFileSystem = FSUtil
 
 export const ReadInput = Schema.Struct({
   path: RelativePath,
