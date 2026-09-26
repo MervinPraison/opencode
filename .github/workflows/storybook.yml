@@ -9,7 +9,6 @@ on:
       - "bun.lock"
       - "packages/storybook/**"
       - "packages/ui/**"
-      - "packages/session-ui/**"
   pull_request:
     branches: [dev]
     paths:
@@ -18,7 +17,6 @@ on:
       - "bun.lock"
       - "packages/storybook/**"
       - "packages/ui/**"
-      - "packages/session-ui/**"
   workflow_dispatch:
 
 concurrency:
