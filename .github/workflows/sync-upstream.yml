@@ -1,0 +1,50 @@
+name: Sync fork with upstream
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Reset to upstream and re-apply fork workflows
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          preserve="${RUNNER_TEMP}/fork-preserve"
+          mkdir -p "${preserve}"
+          cp -a .github/workflows "${preserve}/workflows"
+          mkdir -p "${preserve}/script"
+          cp script/setup-mac-runner.sh "${preserve}/script/" 2>/dev/null || true
+
+          git fetch origin dev
+          git remote add upstream https://github.com/anomalyco/opencode.git || \
+            git remote set-url upstream https://github.com/anomalyco/opencode.git
+          git fetch upstream dev
+
+          git reset --hard upstream/dev
+
+          rm -rf .github/workflows
+          mkdir -p .github/workflows
+          cp -a "${preserve}/workflows/." .github/workflows/
+          mkdir -p script
+          cp "${preserve}/script/setup-mac-runner.sh" script/setup-mac-runner.sh 2>/dev/null || true
+
+          git add .github/workflows
+          git add script/setup-mac-runner.sh 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "fork: maintain upstream sync workflows"
+
+          git push --force-with-lease origin HEAD:dev
