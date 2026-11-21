@@ -1,4 +1,4 @@
-name: triage-close-prs
+name: close-prs
 
 on:
   schedule:
